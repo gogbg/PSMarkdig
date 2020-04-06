@@ -1,4 +1,4 @@
-function Get-MhDocument
+function Get-MdDocument
 {
   [cmdletBinding()]
   [OutputType([Markdig.Syntax.MarkdownDocument])]
@@ -24,7 +24,7 @@ function Get-MhDocument
   }
 }
 
-function Get-MhElement
+function Get-MdElement
 {
   [cmdletBinding()]
   param

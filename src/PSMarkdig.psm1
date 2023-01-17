@@ -30,7 +30,7 @@ function Get-MdElement
   param
   (
     [Parameter(Mandatory)]
-    [Markdig.Syntax.MarkdownDocument]$Document,
+    [Markdig.Syntax.MarkdownObject]$Document,
 
     [Parameter(Mandatory)]
     [string]$TypeName
@@ -48,6 +48,30 @@ function Get-MdElement
     $mdExtensionsType = [Markdig.Syntax.MarkdownObjectExtensions]
     $methodDescendants = [Markdig.Syntax.MarkdownObjectExtensions].GetMethod('Descendants',1,[Markdig.Syntax.MarkdownObject])
     $method = $methodDescendants.MakeGenericMethod($Type)
-    $method.Invoke($mdExtensionsType,@(,$Document)) | ForEach-Object {$PSCmdlet.WriteObject($_,$false)}
+    $method.Invoke($mdExtensionsType,@(,$Document)) | ForEach-Object {$PSCmdlet.WriteObject($_,$false)} | Write-Output -NoEnumerate
+  }
+}
+
+function Convert-MdToString {
+  [cmdletBinding()]
+  [OutputType([string])]
+  param (
+    [Parameter(Mandatory, ValueFromPipeline)]
+    [Markdig.Syntax.MarkdownObject[]]$InputObject
+  )
+
+  begin {
+    $stringWriter = [System.IO.StringWriter]::new()
+    $renderer = [Markdig.Renderers.Normalize.NormalizeRenderer]::new($stringWriter)
+  }
+
+  process {
+    foreach ($io in $InputObject) {
+      $null = $renderer.Render($io)
+    }
+  }
+
+  end {
+    $stringWriter.ToString()
   }
 }
